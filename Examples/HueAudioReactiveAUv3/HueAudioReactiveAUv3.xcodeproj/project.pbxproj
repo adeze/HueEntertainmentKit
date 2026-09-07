@@ -1,0 +1,659 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04D777AF1A287DF9A24BF1F0 /* HueAudioReactiveUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8C33E99EB29B57E7D9B32E /* HueAudioReactiveUnit.swift */; };
+		3EB5304AC2FB3850F328FB4F /* HueAudioReactiveUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8C33E99EB29B57E7D9B32E /* HueAudioReactiveUnit.swift */; };
+		5088C520D068181A8FA9FB8B /* HueAudioReactiveMacExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 86C2F9E45BB39823741EA0E6 /* HueAudioReactiveMacExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		71B132C4FD07997191EDD0B1 /* AudioUnitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2C25F0B3C1C3D29031F2C2 /* AudioUnitViewController.swift */; };
+		74D776428544C0402CA0ADF9 /* HueEntertainmentAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 6309AF48A4EAA8645842B3F6 /* HueEntertainmentAudio */; };
+		9A623CEC6B738A4A1FF0ADEE /* HueAudioReactiveTVExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C0412EB4CE408254B11A3A8F /* HueAudioReactiveTVExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A91DB4E3799CE3B2098B3872 /* HueEntertainmentAudio in Frameworks */ = {isa = PBXBuildFile; productRef = ACB35577A08B52629B48B8D0 /* HueEntertainmentAudio */; };
+		B1A077122E3982ABF9121A8F /* HueEntertainmentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8B6D29AAA284715B5EAFC7B9 /* HueEntertainmentKit */; };
+		B30FA617EB9DC504D6CBC154 /* HostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15817F89E9686AA6A39FDBBF /* HostApp.swift */; };
+		C52C3A097844D65CFDBA0F2C /* HostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15817F89E9686AA6A39FDBBF /* HostApp.swift */; };
+		DBA673FB00F3B300196E4789 /* HueEntertainmentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2C06C4BAD2799CFE3B45917E /* HueEntertainmentKit */; };
+		EA1E407B70E2D62C201C67DF /* AudioUnitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2C25F0B3C1C3D29031F2C2 /* AudioUnitViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		16D4EEACC42DBF0630E7AF52 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1EBC842C431F190AD3ACB789 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC7D60033C55590538FD0CC7;
+			remoteInfo = HueAudioReactiveTVExtension;
+		};
+		2176449208CBC90DFDC380BF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1EBC842C431F190AD3ACB789 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 59DC7AE194C4B7065324C2D7;
+			remoteInfo = HueAudioReactiveMacExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		00E9C3A77E45C259A809090F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9A623CEC6B738A4A1FF0ADEE /* HueAudioReactiveTVExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		23626FFC4AC62B3FF3AA0ED5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5088C520D068181A8FA9FB8B /* HueAudioReactiveMacExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		15817F89E9686AA6A39FDBBF /* HostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostApp.swift; sourceTree = "<group>"; };
+		707C252CD5EBCCB077E670D7 /* HueAudioReactiveTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HueAudioReactiveTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C2C25F0B3C1C3D29031F2C2 /* AudioUnitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitViewController.swift; sourceTree = "<group>"; };
+		86C2F9E45BB39823741EA0E6 /* HueAudioReactiveMacExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HueAudioReactiveMacExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D8B924140DBE7F5A6C70FA3 /* HueEntertainmentKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HueEntertainmentKit; path = ../..; sourceTree = SOURCE_ROOT; };
+		AD8C33E99EB29B57E7D9B32E /* HueAudioReactiveUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HueAudioReactiveUnit.swift; sourceTree = "<group>"; };
+		C0412EB4CE408254B11A3A8F /* HueAudioReactiveTVExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = HueAudioReactiveTVExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0DAD45415A16941A7DA5C65 /* HueAudioReactiveMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueAudioReactiveMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0DB65CC1CAF273FB58F79C2A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1A077122E3982ABF9121A8F /* HueEntertainmentKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F2ABA633A733D3725A90E0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBA673FB00F3B300196E4789 /* HueEntertainmentKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A8C3AD5F4923D14795DE4FA9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A91DB4E3799CE3B2098B3872 /* HueEntertainmentAudio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFE872D17D29523842EF4D99 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74D776428544C0402CA0ADF9 /* HueEntertainmentAudio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		38385C00F4FF447BCCF49258 = {
+			isa = PBXGroup;
+			children = (
+				5370B2311D1567BA64A6C904 /* Packages */,
+				E935BA70C63D36E499600B13 /* Shared */,
+				AD7A33431170634CE7C0261C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5370B2311D1567BA64A6C904 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				8D8B924140DBE7F5A6C70FA3 /* HueEntertainmentKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		AD7A33431170634CE7C0261C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E0DAD45415A16941A7DA5C65 /* HueAudioReactiveMac.app */,
+				86C2F9E45BB39823741EA0E6 /* HueAudioReactiveMacExtension.appex */,
+				707C252CD5EBCCB077E670D7 /* HueAudioReactiveTV.app */,
+				C0412EB4CE408254B11A3A8F /* HueAudioReactiveTVExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E935BA70C63D36E499600B13 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				7C2C25F0B3C1C3D29031F2C2 /* AudioUnitViewController.swift */,
+				15817F89E9686AA6A39FDBBF /* HostApp.swift */,
+				AD8C33E99EB29B57E7D9B32E /* HueAudioReactiveUnit.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		15889969D8DF044C8C2ECD1A /* HueAudioReactiveTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30F001607BE6FA5A7D991CE6 /* Build configuration list for PBXNativeTarget "HueAudioReactiveTV" */;
+			buildPhases = (
+				68B903214E9F161E2EE9DE0C /* Sources */,
+				0DB65CC1CAF273FB58F79C2A /* Frameworks */,
+				00E9C3A77E45C259A809090F /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				04E76976781BF1402F0CEEE2 /* PBXTargetDependency */,
+			);
+			name = HueAudioReactiveTV;
+			packageProductDependencies = (
+				8B6D29AAA284715B5EAFC7B9 /* HueEntertainmentKit */,
+			);
+			productName = HueAudioReactiveTV;
+			productReference = 707C252CD5EBCCB077E670D7 /* HueAudioReactiveTV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		59DC7AE194C4B7065324C2D7 /* HueAudioReactiveMacExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B83579AB2444811420C6857D /* Build configuration list for PBXNativeTarget "HueAudioReactiveMacExtension" */;
+			buildPhases = (
+				C74C88BF1BD04C75BBE26305 /* Sources */,
+				FFE872D17D29523842EF4D99 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HueAudioReactiveMacExtension;
+			packageProductDependencies = (
+				6309AF48A4EAA8645842B3F6 /* HueEntertainmentAudio */,
+			);
+			productName = HueAudioReactiveMacExtension;
+			productReference = 86C2F9E45BB39823741EA0E6 /* HueAudioReactiveMacExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AC7D60033C55590538FD0CC7 /* HueAudioReactiveTVExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34995FB2EBF3569E383DA5E0 /* Build configuration list for PBXNativeTarget "HueAudioReactiveTVExtension" */;
+			buildPhases = (
+				848284CD5003BA189015F6DD /* Sources */,
+				A8C3AD5F4923D14795DE4FA9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HueAudioReactiveTVExtension;
+			packageProductDependencies = (
+				ACB35577A08B52629B48B8D0 /* HueEntertainmentAudio */,
+			);
+			productName = HueAudioReactiveTVExtension;
+			productReference = C0412EB4CE408254B11A3A8F /* HueAudioReactiveTVExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C61216C4612C09B074E7BF11 /* HueAudioReactiveMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1BBE7AEC39AE829832365F6A /* Build configuration list for PBXNativeTarget "HueAudioReactiveMac" */;
+			buildPhases = (
+				72BCBC5A21A38E063F65EE44 /* Sources */,
+				9F2ABA633A733D3725A90E0D /* Frameworks */,
+				23626FFC4AC62B3FF3AA0ED5 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8663B200E0EC0751CE176055 /* PBXTargetDependency */,
+			);
+			name = HueAudioReactiveMac;
+			packageProductDependencies = (
+				2C06C4BAD2799CFE3B45917E /* HueEntertainmentKit */,
+			);
+			productName = HueAudioReactiveMac;
+			productReference = E0DAD45415A16941A7DA5C65 /* HueAudioReactiveMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1EBC842C431F190AD3ACB789 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					15889969D8DF044C8C2ECD1A = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					59DC7AE194C4B7065324C2D7 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					AC7D60033C55590538FD0CC7 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					C61216C4612C09B074E7BF11 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A32A2A1AFFE557756951D295 /* Build configuration list for PBXProject "HueAudioReactiveAUv3" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 38385C00F4FF447BCCF49258;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7EA59ED8B41F902BE07EC4D0 /* XCLocalSwiftPackageReference "../.." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AD7A33431170634CE7C0261C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C61216C4612C09B074E7BF11 /* HueAudioReactiveMac */,
+				59DC7AE194C4B7065324C2D7 /* HueAudioReactiveMacExtension */,
+				15889969D8DF044C8C2ECD1A /* HueAudioReactiveTV */,
+				AC7D60033C55590538FD0CC7 /* HueAudioReactiveTVExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		68B903214E9F161E2EE9DE0C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C52C3A097844D65CFDBA0F2C /* HostApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72BCBC5A21A38E063F65EE44 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B30FA617EB9DC504D6CBC154 /* HostApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		848284CD5003BA189015F6DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71B132C4FD07997191EDD0B1 /* AudioUnitViewController.swift in Sources */,
+				3EB5304AC2FB3850F328FB4F /* HueAudioReactiveUnit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C74C88BF1BD04C75BBE26305 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E407B70E2D62C201C67DF /* AudioUnitViewController.swift in Sources */,
+				04D777AF1A287DF9A24BF1F0 /* HueAudioReactiveUnit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		04E76976781BF1402F0CEEE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC7D60033C55590538FD0CC7 /* HueAudioReactiveTVExtension */;
+			targetProxy = 16D4EEACC42DBF0630E7AF52 /* PBXContainerItemProxy */;
+		};
+		8663B200E0EC0751CE176055 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 59DC7AE194C4B7065324C2D7 /* HueAudioReactiveMacExtension */;
+			targetProxy = 2176449208CBC90DFDC380BF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0023DF4309269617A122BA58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = tvOS/Extension.entitlements;
+				INFOPLIST_FILE = "tvOS/Extension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		0FB22E0A627FB88F7410CB62 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = tvOS/Extension.entitlements;
+				INFOPLIST_FILE = "tvOS/Extension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		2966F1311882AD028679E83B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Release;
+		};
+		3F6F4762D421F62C855F91B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = macOS/Extension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "macOS/Extension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		5375C64614A54C9139A6039C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = tvOS/Host.entitlements;
+				INFOPLIST_FILE = "tvOS/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		644456715D6307A35AFA033C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Debug;
+		};
+		A164AB46A59949502F4E36AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = macOS/Host.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "macOS/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E9518362AB57E8EE129F44E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = macOS/Host.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "macOS/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F5F83C7A3651B3479C519F8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = macOS/Extension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "macOS/Extension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FFDC4F28D8838224FD57EF1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = tvOS/Host.entitlements;
+				INFOPLIST_FILE = "tvOS/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1BBE7AEC39AE829832365F6A /* Build configuration list for PBXNativeTarget "HueAudioReactiveMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A164AB46A59949502F4E36AE /* Debug */,
+				E9518362AB57E8EE129F44E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		30F001607BE6FA5A7D991CE6 /* Build configuration list for PBXNativeTarget "HueAudioReactiveTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5375C64614A54C9139A6039C /* Debug */,
+				FFDC4F28D8838224FD57EF1B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		34995FB2EBF3569E383DA5E0 /* Build configuration list for PBXNativeTarget "HueAudioReactiveTVExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0FB22E0A627FB88F7410CB62 /* Debug */,
+				0023DF4309269617A122BA58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A32A2A1AFFE557756951D295 /* Build configuration list for PBXProject "HueAudioReactiveAUv3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				644456715D6307A35AFA033C /* Debug */,
+				2966F1311882AD028679E83B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B83579AB2444811420C6857D /* Build configuration list for PBXNativeTarget "HueAudioReactiveMacExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F6F4762D421F62C855F91B2 /* Debug */,
+				F5F83C7A3651B3479C519F8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7EA59ED8B41F902BE07EC4D0 /* XCLocalSwiftPackageReference "../.." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2C06C4BAD2799CFE3B45917E /* HueEntertainmentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HueEntertainmentKit;
+		};
+		6309AF48A4EAA8645842B3F6 /* HueEntertainmentAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HueEntertainmentAudio;
+		};
+		8B6D29AAA284715B5EAFC7B9 /* HueEntertainmentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HueEntertainmentKit;
+		};
+		ACB35577A08B52629B48B8D0 /* HueEntertainmentAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HueEntertainmentAudio;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1EBC842C431F190AD3ACB789 /* Project object */;
+}

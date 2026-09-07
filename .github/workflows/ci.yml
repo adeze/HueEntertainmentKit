@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  swift:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift --version
+      - run: swift test
+      - run: swift build -c release
+      - name: Validate property lists
+        run: find Examples -name '*.plist' -print0 | xargs -0 -n1 plutil -lint
+      - name: Build macOS AUv3 host and extension
+        run: |
+          xcodebuild -quiet \
+            -project Examples/HueAudioReactiveAUv3/HueAudioReactiveAUv3.xcodeproj \
+            -scheme HueAudioReactiveMac \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/HueAudioReactiveMac" \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Type-check tvOS AUv3 host and extension
+        run: |
+          TVOS_SDK="$(xcrun --sdk appletvos --show-sdk-path)"
+          swift build --triple arm64-apple-tvos18.0 --sdk "$TVOS_SDK"
+          TVOS_MODULES="$(find .build -type d -path '*apple-tvos/debug/Modules' -print -quit)"
+          TVOS_MODULEMAP="$(find .build -path '*apple-tvos/debug/HueEntertainmentAudioRT.build/module.modulemap' -print -quit)"
+          swiftc -typecheck -parse-as-library -target arm64-apple-tvos18.0 -sdk "$TVOS_SDK" \
+            Examples/HueAudioReactiveAUv3/Shared/HueAudioReactiveUnit.swift \
+            Examples/HueAudioReactiveAUv3/Shared/AudioUnitViewController.swift \
+            -I "$TVOS_MODULES" -Xcc -fmodule-map-file="$TVOS_MODULEMAP"
+          swiftc -typecheck -parse-as-library -target arm64-apple-tvos18.0 -sdk "$TVOS_SDK" \
+            Examples/HueAudioReactiveAUv3/Shared/HostApp.swift \
+            -I "$TVOS_MODULES" -Xcc -fmodule-map-file="$TVOS_MODULEMAP"

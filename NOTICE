@@ -1,0 +1,9 @@
+HueEntertainmentKit is an independent implementation based on public Philips Hue
+documentation and independently observed protocol behavior.
+
+Design review references:
+- Mirrorball, Copyright its contributors, MIT License.
+- HueEntertainmentSwift, Copyright its contributors, MIT License.
+
+No Philips Hue EDK source code is included, translated, or redistributed.
+Philips Hue is a trademark of Signify Holding.

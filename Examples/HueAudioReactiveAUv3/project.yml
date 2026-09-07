@@ -1,0 +1,62 @@
+name: HueAudioReactiveAUv3
+options:
+  deploymentTarget:
+    macOS: "15.0"
+    tvOS: "18.0"
+packages:
+  HueEntertainmentKit:
+    path: ../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+targets:
+  HueAudioReactiveMac:
+    type: application
+    platform: macOS
+    sources: [Shared/HostApp.swift]
+    info:
+      path: macOS/Host-Info.plist
+    entitlements:
+      path: macOS/Host.entitlements
+    dependencies:
+      - target: HueAudioReactiveMacExtension
+        embed: true
+      - package: HueEntertainmentKit
+        product: HueEntertainmentKit
+  HueAudioReactiveMacExtension:
+    type: app-extension
+    platform: macOS
+    sources: [Shared/HueAudioReactiveUnit.swift, Shared/AudioUnitViewController.swift]
+    info:
+      path: macOS/Extension-Info.plist
+    entitlements:
+      path: macOS/Extension.entitlements
+    dependencies:
+      - package: HueEntertainmentKit
+        product: HueEntertainmentAudio
+  HueAudioReactiveTV:
+    type: application
+    platform: tvOS
+    sources: [Shared/HostApp.swift]
+    info:
+      path: tvOS/Host-Info.plist
+    entitlements:
+      path: tvOS/Host.entitlements
+    dependencies:
+      - target: HueAudioReactiveTVExtension
+        embed: true
+      - package: HueEntertainmentKit
+        product: HueEntertainmentKit
+  HueAudioReactiveTVExtension:
+    type: app-extension
+    platform: tvOS
+    sources: [Shared/HueAudioReactiveUnit.swift, Shared/AudioUnitViewController.swift]
+    info:
+      path: tvOS/Extension-Info.plist
+    entitlements:
+      path: tvOS/Extension.entitlements
+    dependencies:
+      - package: HueEntertainmentKit
+        product: HueEntertainmentAudio
