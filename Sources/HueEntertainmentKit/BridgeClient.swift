@@ -40,6 +40,7 @@ public struct HueBridgeClient: HueEntertainmentControl, Sendable {
 
     public func pair(deviceType: String) async throws -> HuePairingResult {
         guard !deviceType.isEmpty else { throw HueEntertainmentError.malformedResponse }
+        HueLog.client.info("Initiating pairing with \(self.endpoint.host)")
         let body = try encoder.encode(PairRequest(devicetype: deviceType, generateclientkey: true))
         let response = try await transport.send(HueHTTPRequest(
             method: .post,
@@ -69,6 +70,7 @@ public struct HueBridgeClient: HueEntertainmentControl, Sendable {
             clientKey: provisional.clientKey,
             applicationID: applicationID
         )
+        HueLog.client.info("Pairing complete, application ID: \(applicationID ?? "none")")
         return HuePairingResult(credentials: credentials, applicationID: applicationID)
     }
 
@@ -95,13 +97,16 @@ public struct HueBridgeClient: HueEntertainmentControl, Sendable {
     }
 
     public func entertainmentConfigurations() async throws -> [HueEntertainmentConfiguration] {
+        HueLog.client.debug("Fetching entertainment configurations from \(self.endpoint.host)")
         let response = try await authenticatedRequest(
             method: .get,
             path: "clip/v2/resource/entertainment_configuration"
         )
         let envelope = try decoder.decode(ConfigurationEnvelope.self, from: response.body)
         try Self.throwBridgeErrors(envelope.errors)
-        return try Self.configurations(from: envelope.data)
+        let configurations = try Self.configurations(from: envelope.data)
+        HueLog.client.debug("Fetched \(configurations.count) configurations")
+        return configurations
     }
 
     public func streamStatus(configurationID: UUID) async throws -> HueStreamStatus {
@@ -141,6 +146,7 @@ public struct HueBridgeClient: HueEntertainmentControl, Sendable {
     }
 
     public func setStreamActive(configurationID: UUID, active: Bool) async throws {
+        HueLog.client.info("Setting stream active=\(active) for configuration \(configurationID.uuidString)")
         let body = try encoder.encode(StreamAction(action: active ? "start" : "stop"))
         let response = try await authenticatedRequest(
             method: .put,

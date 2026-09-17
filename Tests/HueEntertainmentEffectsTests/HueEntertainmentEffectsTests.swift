@@ -32,4 +32,30 @@ import Testing
         let accepted = try limiter.limit(white, at: .milliseconds(250))
         #expect(accepted.colors[0].color.red == 0.8)
     }
+
+    @Test func framePacingThrottlesBurst() async throws {
+        let (stream, continuation) = AsyncStream.makeStream(of: HueFrame.self)
+        let black = try HueFrame(colors: [.init(channelID: 0, color: .black)])
+        let white = try HueFrame(colors: [.init(channelID: 0, color: try .init(red: 1, green: 1, blue: 1))])
+
+        let pacedStream = stream.paceForEntertainment(frameRate: 50)
+        let collectorTask = Task { () -> [HueFrame] in
+            var results: [HueFrame] = []
+            for await frame in pacedStream {
+                results.append(frame)
+                if results.count >= 2 { break }
+            }
+            return results
+        }
+
+        continuation.yield(black)
+        try await Task.sleep(for: .milliseconds(30))
+        continuation.yield(white)
+        continuation.finish()
+
+        let collected = await collectorTask.value
+        #expect(collected.count == 2)
+        #expect(collected[0] == black)
+        #expect(collected[1] == white)
+    }
 }

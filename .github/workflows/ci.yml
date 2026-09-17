@@ -18,6 +18,10 @@ jobs:
       - run: swift --version
       - run: swift test
       - run: swift build -c release
+      - name: Lint with SwiftLint
+        run: swift package --allow-writing-to-package-directory swiftlint lint Sources Tests --strict
+      - name: Build DocC Documentation
+        run: swift package generate-documentation --target HueEntertainmentKit
       - name: Validate property lists
         run: find Examples -name '*.plist' -print0 | xargs -0 -n1 plutil -lint
       - name: Build macOS AUv3 host and extension

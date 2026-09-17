@@ -2,6 +2,7 @@ import Foundation
 import HueEntertainmentKit
 import HueEntertainmentTesting
 import NIOCore
+import NIOEmbedded
 import Security
 import Testing
 
@@ -94,5 +95,54 @@ import Testing
         let transitions = await control.transitions
         #expect(transitions.map(\.1) == [true, false])
         #expect(await session.state == .idle)
+    }
+
+    @Test func sessionEmitsStateUpdates() async throws {
+        let channel = try HueEntertainmentChannel(id: 0, position: .zero)
+        let free = HueEntertainmentConfiguration(id: UUID(), name: "Free", isActive: false, channels: [channel])
+        let control = MockHueEntertainmentControl()
+        let transport = MockHueDatagramTransport()
+        let session = HueEntertainmentSession(control: control, transport: transport)
+        let endpoint = try HueBridgeEndpoint(host: "bridge.local")
+        let credentials = try HueCredentials(applicationKey: "app", clientKey: "00112233445566778899aabbccddeeff", applicationID: "app-id")
+
+        let statesTask = Task { () -> [HueSessionState] in
+            var recorded: [HueSessionState] = []
+            for await state in session.stateUpdates {
+                recorded.append(state)
+                if state == .idle && recorded.count > 1 { break }
+            }
+            return recorded
+        }
+
+        try await Task.sleep(for: .milliseconds(20))
+
+        try await session.start(configuration: free, endpoint: endpoint, credentials: credentials)
+        try await session.stop()
+
+        let observed = await statesTask.value
+        #expect(observed.contains(.claiming))
+        #expect(observed.contains(.handshaking))
+        #expect(observed.contains(.streaming))
+        #expect(observed.contains(.releasing))
+        #expect(observed.last == .idle)
+    }
+
+    @Test func streamChannelHandlerEncodesEnvelope() async throws {
+        let channel = EmbeddedChannel(handler: HueStreamChannelHandler())
+        let id = UUID(uuidString: "00112233-4455-6677-8899-aabbccddeeff")!
+        let frame = try HueFrame(colors: [
+            HueChannelColor(channelID: 0, color: try HueRGBColor(red: 1, green: 0, blue: 0)),
+        ])
+        let message = HueStreamMessage(
+            configurationID: id,
+            sequence: 42,
+            frame: frame
+        )
+        try await channel.writeAndFlush(message)
+        var output: ByteBuffer? = try channel.readOutbound(as: ByteBuffer.self)
+        #expect(output != nil)
+        #expect(output?.readString(length: 9) == "HueStream")
+        _ = try channel.finish()
     }
 }

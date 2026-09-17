@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 public enum HueTakeoverPolicy: Sendable { case failIfActive }
 
@@ -22,6 +23,7 @@ public actor HueEntertainmentSession {
     private var pumpTask: Task<Void, Never>?
     private let frameInterval: Duration
     private var ownsConfiguration = false
+    private var stateContinuations: [UUID: AsyncStream<HueSessionState>.Continuation] = [:]
 
     public init(
         control: any HueEntertainmentControl,
@@ -35,6 +37,39 @@ public actor HueEntertainmentSession {
         self.frameInterval = .seconds(1 / min(max(frameRate, 25), 60))
     }
 
+    /// Returns an `AsyncStream` that emits the current session state and all subsequent state transitions.
+    public nonisolated var stateUpdates: AsyncStream<HueSessionState> {
+        AsyncStream { continuation in
+            Task { [weak self] in
+                await self?.registerContinuation(continuation)
+            }
+        }
+    }
+
+    private func registerContinuation(_ continuation: AsyncStream<HueSessionState>.Continuation) {
+        let id = UUID()
+        stateContinuations[id] = continuation
+        continuation.yield(state)
+        continuation.onTermination = { [weak self] _ in
+            Task { [weak self] in
+                await self?.removeContinuation(id)
+            }
+        }
+    }
+
+    private func removeContinuation(_ id: UUID) {
+        stateContinuations.removeValue(forKey: id)
+    }
+
+    private func transition(to newState: HueSessionState) {
+        guard state != newState else { return }
+        state = newState
+        HueLog.session.info("Session state: \(String(describing: newState))")
+        for continuation in stateContinuations.values {
+            continuation.yield(newState)
+        }
+    }
+
     public func start(
         configuration: HueEntertainmentConfiguration,
         endpoint: HueBridgeEndpoint,
@@ -46,22 +81,28 @@ public actor HueEntertainmentSession {
         guard let applicationID = credentials.applicationID, !applicationID.isEmpty else {
             throw HueEntertainmentError.missingApplicationID
         }
-        state = .claiming
+
+        HueLog.session.info("Claiming configuration \(configuration.id.uuidString) on \(endpoint.host)")
+        transition(to: .claiming)
         do {
             try await control.setStreamActive(configurationID: configuration.id, active: true)
             try await waitForOwnership(configurationID: configuration.id, applicationID: applicationID)
             ownsConfiguration = true
-            state = .handshaking
+
+            HueLog.session.info("Handshaking DTLS with \(endpoint.host)")
+            transition(to: .handshaking)
             try await transport.connect(endpoint: endpoint, credentials: credentials)
             self.configuration = configuration
             sequence = 0
-            state = .streaming
+
+            HueLog.session.info("Streaming active for \(configuration.id.uuidString)")
+            transition(to: .streaming)
             pumpTask = Task { await self.pump() }
         } catch {
             await transport.close()
             if ownsConfiguration { try? await control.setStreamActive(configurationID: configuration.id, active: false) }
             ownsConfiguration = false
-            state = .failed(String(describing: error))
+            transition(to: .failed(String(describing: error)))
             throw error
         }
     }
@@ -75,10 +116,12 @@ public actor HueEntertainmentSession {
     public func stop() async throws {
         guard let configuration else {
             await transport.close()
-            state = .idle
+            transition(to: .idle)
             return
         }
-        state = .releasing
+
+        HueLog.session.info("Releasing session for \(configuration.id.uuidString)")
+        transition(to: .releasing)
         latestFrame = nil
         pumpTask?.cancel()
         await pumpTask?.value
@@ -91,13 +134,13 @@ public actor HueEntertainmentSession {
             } catch {
                 ownsConfiguration = false
                 self.configuration = nil
-                state = .failed(String(describing: error))
+                transition(to: .failed(String(describing: error)))
                 throw error
             }
         }
         ownsConfiguration = false
         self.configuration = nil
-        state = .idle
+        transition(to: .idle)
     }
 
     private func pump() async {
@@ -111,7 +154,7 @@ public actor HueEntertainmentSession {
             do {
                 try await transport.send(packet)
             } catch {
-                state = .failed(String(describing: error))
+                transition(to: .failed(String(describing: error)))
                 latestFrame = nil
                 await transport.close()
                 if ownsConfiguration { try? await control.setStreamActive(configurationID: configuration.id, active: false) }

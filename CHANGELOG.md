@@ -15,12 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Bridge discovery via Bonjour mDNS, Philips Hue cloud broker, and manual IP/host.
   - Pushlink pairing workflow with physical link button polling and cancellation support.
   - Secure credential storage backed by macOS/iOS Keychain (`KeychainHueCredentialStore`).
+  - Color interoperability with `CGColor`, SwiftUI `Color`, hex strings (`#FF5500`), and named presets (`.red`, `.green`, etc.).
+  - CIE 1931 xy color space conversion with official Philips Hue Gamuts A, B, and C clamping.
+  - Reactive `AsyncStream` live Bonjour discovery (`bonjourStream()`) and real-time session state observation (`stateUpdates`).
+  - Unified logging integration via `swift-log` (`Logging.Logger`) across discovery, client, transport, and session lifecycle.
+  - Swift-NIO Channel Pipeline support with `HueStreamChannelHandler: ChannelDuplexHandler` and `HueStreamMessage`.
+  - Native Swift-NIO HTTP transport (`NIOHueHTTPTransport`) powered by `NIOHTTP1` and `NIOTransportServices` with Signify Hue root CA verification.
   - HueStream v2 packet encoder supporting RGB and XY+Brightness color spaces up to 20 channels.
   - DTLS 1.2 UDP datagram transport powered by Apple Network framework (`NIOTSDTLSTransport`).
   - Actor-isolated `HueEntertainmentSession` managing exclusive configuration ownership, DTLS handshake, 50 Hz frame pumping, and graceful cleanup.
 - `HueEntertainmentEffects`:
   - Spatial effect primitives mapped to room coordinates (`HueAreaEffect`, `HueLightSourceEffect`, `HueMultiChannelEffect`, `HueLightIteratorEffect`).
   - Source-over alpha blending mixer and deterministic animation timelines (`HueTimeline`).
+  - Allocation-free sliding window history using `Deque` from `swift-collections` in `HueSafeFrameLimiter`.
+  - Frame pacing for asynchronous sequences via `AsyncSequence.paceForEntertainment(frameRate:)` using `swift-async-algorithms`.
   - Photosensitivity safety limiter (`HueSafeFrameLimiter`) capping transitions below 5 Hz and enforcing 80% maximum component limits by default.
 - `HueEntertainmentAudio`:
   - Real-time C11 atomic seqlock mailbox (`HueAudioFeatureMailbox`) for zero-allocation, lock-free feature publication from audio render threads.

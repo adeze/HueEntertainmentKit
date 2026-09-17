@@ -2,14 +2,19 @@
 
 [![Swift 6.0+](https://img.shields.io/badge/Swift-6.0%2B-F05138.svg?style=flat&logo=swift)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/Platforms-macOS%2015+%20|%20iOS%2018+%20|%20tvOS%2018+%20|%20visionOS%202+-blue.svg?style=flat&logo=apple)](https://developer.apple.com)
+[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat&logo=swift)](https://swift.org/package-manager/)
+[![Swift Package Index](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fadeze%2FHueEntertainmentKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/adeze/HueEntertainmentKit)
+[![Swift Package Index Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fadeze%2FHueEntertainmentKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/adeze/HueEntertainmentKit)
+[![DocC Documentation](https://img.shields.io/badge/DocC-Documentation-blue.svg?style=flat&logo=apple)](https://swiftpackageindex.com/adeze/HueEntertainmentKit/documentation)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![CI](https://github.com/adeze/HueEntertainmentKit/actions/workflows/ci.yml/badge.svg)](https://github.com/adeze/HueEntertainmentKit/actions/workflows/ci.yml)
 
 An independent, clean-room Swift implementation of the **Philips Hue Entertainment API** for Apple platforms.
 
 HueEntertainmentKit provides high-performance, real-time spatial lighting synchronization with strict security guarantees:
-- **CLIP v2 HTTP**: Built on native `URLSession` with strict TLS certificate chain validation against official Hue Bridge root CAs.
-- **HueStream v2 DTLS**: UDP streaming powered by Apple Network framework via `NIOTransportServices` with TLS 1.2 PSK encryption.
+- **CLIP v2 HTTP**: Native `URLSession` or high-throughput Swift-NIO HTTP/1.1 (`NIOHueHTTPTransport`) with strict TLS certificate chain validation against official Signify Hue root CAs.
+- **HueStream v2 DTLS**: UDP streaming powered by Apple Network framework via `NIOTransportServices` with TLS 1.2 PSK encryption and Swift-NIO channel duplex pipelines (`HueStreamChannelHandler`).
+- **Ecosystem Modernization**: Built-in support for `swift-log`, `swift-collections` (allocation-free `Deque` sliding windows), and `swift-async-algorithms` (`_throttle` sequence pacing).
 - **Photosensitivity Safety**: Built-in `HueSafeFrameLimiter` enforcing Philips Hue guidance to keep rapid brightness transitions under 5 Hz.
 - **Real-Time Audio**: Lock-free, zero-allocation C11 atomic seqlock mailbox for high-frequency audio render callbacks and AUv3 plug-ins.
 - **Swift 6 Strict Concurrency**: Data-race free, actor-isolated session lifecycle and `Sendable` types throughout.
@@ -71,20 +76,42 @@ targets: [
 2. Enter the repository URL: `https://github.com/adeze/HueEntertainmentKit.git`
 3. Select the version rule (e.g. Up to Next Major `0.1.0`) and choose the products needed for your target.
 
+### Documentation & Tooling Plugins
+
+Build or preview interactive DocC documentation locally:
+
+```bash
+swift package generate-documentation --target HueEntertainmentKit
+swift package --disable-sandbox preview-documentation --target HueEntertainmentKit
+```
+
+Run strict linting with the bundled SwiftLint command plugin:
+
+```bash
+swift package --allow-writing-to-package-directory swiftlint lint Sources Tests --strict
+```
+
 ---
 
 ## Quickstart Guide
 
 ### 1. Discover Bridges
 
-Find Hue bridges on the local network via Bonjour mDNS, cloud broker lookup, or manual host entry:
+Find Hue bridges on the local network via reactive Bonjour mDNS streaming, one-shot discovery, cloud broker lookup, or manual host entry:
 
 ```swift
 import HueEntertainmentKit
 
 let discovery = HueBridgeDiscovery()
 
-// Discover via Bonjour (mDNS)
+// Real-time Bonjour streaming as bridges resolve:
+Task {
+    for await endpoint in discovery.bonjourStream() {
+        print("Discovered bridge at \(endpoint.host) (ID: \(endpoint.bridgeID ?? "unknown"))")
+    }
+}
+
+// Or one-shot discovery (scans for 3 seconds):
 let bridges = try await discovery.discoverBonjour(for: .seconds(3))
 
 // Or manual configuration if IP/Host is already known:
@@ -140,7 +167,7 @@ for config in configs {
 
 ### 4. Stream Live Frames with Safety Limiting
 
-`HueEntertainmentSession` manages the exclusive stream claim, DTLS handshake, 50 Hz frame pumping, and graceful cleanup:
+`HueEntertainmentSession` manages the exclusive stream claim, DTLS handshake, 50 Hz frame pumping, and graceful cleanup. Observe state changes reactively via `stateUpdates`:
 
 ```swift
 import HueEntertainmentKit
@@ -155,6 +182,13 @@ let session = HueEntertainmentSession(
     frameRate: 50
 )
 
+// Observe session state transitions (.claiming, .handshaking, .streaming, .releasing, .idle):
+Task {
+    for await state in session.stateUpdates {
+        print("Session state: \(state)")
+    }
+}
+
 // Acquire ownership and establish DTLS stream
 try await session.start(
     configuration: config,
@@ -166,7 +200,8 @@ try await session.start(
 var limiter = HueSafeFrameLimiter()
 
 for frameIndex in 0..<250 { // ~5 seconds at 50Hz
-    let redColor = try HueRGBColor(red: 0.8, green: 0.1, blue: 0.2)
+    // Create colors via presets, hex, or CoreGraphics:
+    let redColor = HueRGBColor.red
     let channel0 = HueChannelColor(channelID: 0, color: redColor)
     let candidateFrame = try HueFrame(colors: [channel0])
 
@@ -181,7 +216,30 @@ for frameIndex in 0..<250 { // ~5 seconds at 50Hz
 try await session.stop()
 ```
 
-### 5. Real-Time Audio Mailbox (AUv3 / CoreAudio)
+### 5. Color Interoperability & CIE 1931 Gamut Conversion
+
+Convert seamlessly between `CoreGraphics`, `SwiftUI`, hex strings, and official Philips Hue CIE 1931 xy gamuts (Gamut A, B, and C):
+
+```swift
+import CoreGraphics
+import HueEntertainmentKit
+
+// 1. CoreGraphics and Hex initialization
+let hexColor = try HueRGBColor(hex: "#FF5500")
+let cgColor = hexColor.cgColor
+
+// 2. Named presets
+let preset = HueRGBColor.cyan
+
+// 3. CIE 1931 xy conversion with Philips Hue Gamut C clamping:
+let xyBrightness = preset.toXYBrightness(gamut: .gamutC)
+print("CIE xy: (\(xyBrightness.x), \(xyBrightness.y)), brightness: \(xyBrightness.brightness)")
+
+// 4. Convert back to RGB:
+let rgbRestored = xyBrightness.toRGB(gamut: .gamutC)
+```
+
+### 6. Real-Time Audio Mailbox (AUv3 / CoreAudio)
 
 Publish features in non-allocating render threads and consume them safely in a 50 Hz control loop:
 
