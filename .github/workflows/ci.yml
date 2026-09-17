@@ -1,7 +1,15 @@
 name: CI
+
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   swift:
     runs-on: macos-26
@@ -24,8 +32,8 @@ jobs:
         run: |
           TVOS_SDK="$(xcrun --sdk appletvos --show-sdk-path)"
           swift build --triple arm64-apple-tvos18.0 --sdk "$TVOS_SDK"
-          TVOS_MODULES="$(find .build -type d -path '*apple-tvos/debug/Modules' -print -quit)"
-          TVOS_MODULEMAP="$(find .build -path '*apple-tvos/debug/HueEntertainmentAudioRT.build/module.modulemap' -print -quit)"
+          TVOS_MODULES="$(find .build \( -path '*/Products/Debug-appletvos' -o -path '*apple-tvos/debug/Modules' \) -type d -print -quit)"
+          TVOS_MODULEMAP="$(find .build \( -path '*HueEntertainmentAudioRT.build/module.modulemap' -o -name 'HueEntertainmentAudioRT.modulemap' \) -print -quit)"
           swiftc -typecheck -parse-as-library -target arm64-apple-tvos18.0 -sdk "$TVOS_SDK" \
             Examples/HueAudioReactiveAUv3/Shared/HueAudioReactiveUnit.swift \
             Examples/HueAudioReactiveAUv3/Shared/AudioUnitViewController.swift \
