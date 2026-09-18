@@ -34,7 +34,8 @@ public actor HueEntertainmentSession {
         self.control = control
         self.transport = transport
         self.encoder = encoder
-        self.frameInterval = .seconds(1 / min(max(frameRate, 25), 60))
+        // Supports standard film and TV cadences down to 20 Hz (e.g. 23.976, 24, 29.97, 30 fps)
+        self.frameInterval = .seconds(1 / min(max(frameRate, 20), 60))
     }
 
     /// Returns an `AsyncStream` that emits the current session state and all subsequent state transitions.
