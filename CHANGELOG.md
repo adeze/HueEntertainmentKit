@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-18
+
+### Added
+
+- Frame rate range lowered to support film and television cadences down to 20 Hz (20–60 Hz), supporting native 23.976, 24.0, 29.97, and 30.0 fps without motion judder.
+- Adaptive deadband throttling in `HueEntertainmentSession`: detects sub-JND static frames and throttles UDP packet transmission down to a 2 Hz heartbeat keep-alive, reducing Bridge load and WiFi airtime by up to 90% while preventing connection timeout.
+- Support for `HueXYFrame` and `HueXYChannelColor` in CIE 1931 xy space with official Gamut C boundary clamping.
+
 ## [0.1.0] - 2026-09-17
 
 ### Added

@@ -24,16 +24,21 @@ public actor HueEntertainmentSession {
     private let frameInterval: Duration
     private var ownsConfiguration = false
     private var stateContinuations: [UUID: AsyncStream<HueSessionState>.Continuation] = [:]
+    private let adaptiveDeadband: Bool
+    private var lastSentFrame: HueFrame?
+    private var lastSentTime: ContinuousClock.Instant = .now
 
     public init(
         control: any HueEntertainmentControl,
         transport: any HueDatagramTransport,
         encoder: HueStreamPacketEncoder = .init(),
-        frameRate: Double = 50
+        frameRate: Double = 50,
+        adaptiveDeadband: Bool = false
     ) {
         self.control = control
         self.transport = transport
         self.encoder = encoder
+        self.adaptiveDeadband = adaptiveDeadband
         // Supports standard film and TV cadences down to 20 Hz (e.g. 23.976, 24, 29.97, 30 fps)
         self.frameInterval = .seconds(1 / min(max(frameRate, 20), 60))
     }
@@ -150,19 +155,43 @@ public actor HueEntertainmentSession {
                 try? await Task.sleep(for: frameInterval)
                 continue
             }
-            let packet = encoder.encode(configurationID: configuration.id, sequence: sequence, frame: frame)
-            sequence &+= 1
-            do {
-                try await transport.send(packet)
-            } catch {
-                transition(to: .failed(String(describing: error)))
-                latestFrame = nil
-                await transport.close()
-                if ownsConfiguration { try? await control.setStreamActive(configurationID: configuration.id, active: false) }
-                ownsConfiguration = false
-                self.configuration = nil
-                break
+
+            let shouldSend: Bool
+            if adaptiveDeadband, let last = lastSentFrame, last.colors.count == frame.colors.count {
+                let isVirtuallyIdentical = zip(last.colors, frame.colors).allSatisfy { prev, curr in
+                    prev.channelID == curr.channelID
+                        && abs(prev.color.red - curr.color.red) < 0.005
+                        && abs(prev.color.green - curr.color.green) < 0.005
+                        && abs(prev.color.blue - curr.color.blue) < 0.005
+                }
+                // Send at least once every 500ms as a keep-alive heartbeat to prevent Bridge timeout
+                if isVirtuallyIdentical {
+                    shouldSend = ContinuousClock.now - lastSentTime >= .milliseconds(500)
+                } else {
+                    shouldSend = true
+                }
+            } else {
+                shouldSend = true
             }
+
+            if shouldSend {
+                let packet = encoder.encode(configurationID: configuration.id, sequence: sequence, frame: frame)
+                sequence &+= 1
+                do {
+                    try await transport.send(packet)
+                    lastSentFrame = frame
+                    lastSentTime = .now
+                } catch {
+                    transition(to: .failed(String(describing: error)))
+                    latestFrame = nil
+                    await transport.close()
+                    if ownsConfiguration { try? await control.setStreamActive(configurationID: configuration.id, active: false) }
+                    ownsConfiguration = false
+                    self.configuration = nil
+                    break
+                }
+            }
+
             try? await Task.sleep(for: frameInterval)
         }
         pumpTask = nil
