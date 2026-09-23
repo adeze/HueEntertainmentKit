@@ -89,8 +89,15 @@ public struct HueEntertainmentChannel: Hashable, Codable, Sendable {
     public let id: UInt8
     public let position: SIMD3<Double>
     public let memberResourceIDs: [String]
+    /// Indexed gradient members reported by the V2 Entertainment Configuration.
+    public let memberSegments: [HueEntertainmentMember]?
 
-    public init(id: Int, position: SIMD3<Double>, memberResourceIDs: [String] = []) throws {
+    public init(
+        id: Int,
+        position: SIMD3<Double>,
+        memberResourceIDs: [String] = [],
+        memberSegments: [HueEntertainmentMember]? = nil
+    ) throws {
         guard (0..<20).contains(id), let id = UInt8(exactly: id) else {
             throw HueEntertainmentError.invalidChannelIdentifier
         }
@@ -100,6 +107,19 @@ public struct HueEntertainmentChannel: Hashable, Codable, Sendable {
         self.id = id
         self.position = position
         self.memberResourceIDs = memberResourceIDs
+        self.memberSegments = memberSegments
+    }
+}
+
+/// A service member and its optional zero-based gradient segment index.
+public struct HueEntertainmentMember: Hashable, Codable, Sendable {
+    public let resourceID: String
+    public let segmentIndex: UInt8?
+
+    /// Creates a member. `segmentIndex` is absent for non-gradient lights.
+    public init(resourceID: String, segmentIndex: UInt8? = nil) {
+        self.resourceID = resourceID
+        self.segmentIndex = segmentIndex
     }
 }
 
@@ -108,6 +128,20 @@ public struct HueEntertainmentConfiguration: Hashable, Codable, Sendable {
     public let name: String
     public let isActive: Bool
     public let channels: [HueEntertainmentChannel]
+
+    /// Returns sorted unique zero-based segment indices for a member service.
+    public func segmentIndices(for resourceID: String) -> [UInt8] {
+        Array(Set(channels.flatMap { channel in
+            channel.memberSegments?.compactMap { member in
+                member.resourceID == resourceID ? member.segmentIndex : nil
+            } ?? []
+        })).sorted()
+    }
+
+    /// Infers a segment count from indexed members, when available.
+    public func inferredSegmentCount(for resourceID: String) -> UInt8? {
+        segmentIndices(for: resourceID).last.map { $0 == .max ? .max : $0 + 1 }
+    }
 
     public init(id: UUID, name: String, isActive: Bool, channels: [HueEntertainmentChannel]) {
         self.id = id

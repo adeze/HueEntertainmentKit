@@ -54,6 +54,30 @@ import Testing
         let configurations = try await client.entertainmentConfigurations()
         #expect(configurations.count == 1)
         #expect(configurations[0].channels[0].memberResourceIDs == ["light-1"])
+        #expect(configurations[0].channels[0].memberSegments == [
+            HueEntertainmentMember(resourceID: "light-1")
+        ])
+    }
+
+    @Test func bridgeClientPreservesGroupedGradientSegmentIndices() async throws {
+        let body = Data(#"{"data":[{"id":"00112233-4455-6677-8899-aabbccddeeff","metadata":{"name":"TV"},"status":"inactive","channels":[{"channel_id":3,"position":{"x":0.8,"y":-0.8,"z":0.0},"members":[{"service":{"rid":"gradient-1"},"index":0},{"service":{"rid":"gradient-1"},"index":1}]},{"channel_id":4,"position":{"x":0.4,"y":0.8,"z":0.0},"members":[{"service":{"rid":"gradient-1"},"index":2},{"service":{"rid":"gradient-1"},"index":3},{"service":{"rid":"gradient-1"},"index":4},{"service":{"rid":"gradient-1"},"index":5},{"service":{"rid":"gradient-1"},"index":6}]}]}],"errors":[]}"#.utf8)
+        let transport = MockHueHTTPTransport(responses: [.init(statusCode: 200, body: body)])
+        let credentials = try HueCredentials(
+            applicationKey: "app",
+            clientKey: "00112233445566778899aabbccddeeff",
+            applicationID: "app-id"
+        )
+        let client = HueBridgeClient(
+            endpoint: try .init(host: "bridge.local"),
+            credentials: credentials,
+            transport: transport
+        )
+
+        let configuration = try await client.entertainmentConfigurations()[0]
+
+        #expect(configuration.channels.map { $0.memberSegments?.compactMap(\.segmentIndex) } == [[0, 1], [2, 3, 4, 5, 6]])
+        #expect(configuration.segmentIndices(for: "gradient-1") == [0, 1, 2, 3, 4, 5, 6])
+        #expect(configuration.inferredSegmentCount(for: "gradient-1") == 7)
     }
 
     @Test func pairingHandlesPushlinkAndCapturesApplicationID() async throws {

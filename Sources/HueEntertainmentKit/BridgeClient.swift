@@ -133,7 +133,13 @@ public struct HueBridgeClient: HueEntertainmentControl, Sendable {
                         channel.position.y,
                         channel.position.z
                     ),
-                    memberResourceIDs: channel.members.map { $0.service.rid }
+                    memberResourceIDs: channel.members.map { $0.service.rid },
+                    memberSegments: channel.members.map {
+                        HueEntertainmentMember(
+                            resourceID: $0.service.rid,
+                            segmentIndex: $0.index.flatMap(UInt8.init(exactly:))
+                        )
+                    }
                 )
             }
             return HueEntertainmentConfiguration(
@@ -221,5 +227,5 @@ private struct RawChannel: Decodable {
     enum CodingKeys: String, CodingKey { case channelID = "channel_id", position, members }
 }
 private struct Position: Decodable { let x: Double; let y: Double; let z: Double }
-private struct Member: Decodable { let service: ResourceReference }
+private struct Member: Decodable { let service: ResourceReference; let index: Int? }
 private struct ResourceReference: Decodable { let rid: String }
