@@ -1,0 +1,14 @@
+version = 1
+name = "HueEntertainmentKit"
+
+[setup]
+script = ""
+
+[[actions]]
+name = "update-dependencies"
+icon = "tool"
+command = '''
+set -euo pipefail
+swift package update
+swift test
+'''
