@@ -129,7 +129,10 @@ import Testing
         }
         try await session.start(configuration: free, endpoint: endpoint, credentials: credentials)
         try await session.submit(try HueFrame(colors: [.init(channelID: 0, color: .black)]))
-        try await Task.sleep(for: .milliseconds(55))
+        let deadline = ContinuousClock.now.advanced(by: .seconds(1))
+        while await transport.packets.count < 2, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(await transport.packets.count >= 2)
         try await session.stop()
         let transitions = await control.transitions
