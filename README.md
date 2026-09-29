@@ -1,6 +1,6 @@
 # HueEntertainmentKit
 
-[![Swift 6.0+](https://img.shields.io/badge/Swift-6.0%2B-F05138.svg?style=flat&logo=swift)](https://swift.org)
+[![Swift 6.4+](https://img.shields.io/badge/Swift-6.4%2B-F05138.svg?style=flat&logo=swift)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/Platforms-macOS%2015+%20|%20iOS%2018+%20|%20tvOS%2018+%20|%20visionOS%202+-blue.svg?style=flat&logo=apple)](https://developer.apple.com)
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat&logo=swift)](https://swift.org/package-manager/)
 [![Swift Package Index](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fadeze%2FHueEntertainmentKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/adeze/HueEntertainmentKit)
@@ -37,8 +37,8 @@ HueEntertainmentKit is modularized into focused Swift Package libraries:
 
 ## Requirements
 
-- **Swift**: 6.0 or later
-- **Xcode**: 16.0 or later
+- **Swift**: 6.4 or later
+- **Xcode**: 27.0 or later
 - **Supported Platforms**:
   - macOS 15.0+ (Sequoia)
   - iOS 18.0+
@@ -74,7 +74,7 @@ targets: [
 
 1. In Xcode, select **File > Add Package Dependencies...**
 2. Enter the repository URL: `https://github.com/adeze/HueEntertainmentKit.git`
-3. Select the version rule (e.g. Up to Next Major `0.1.0`) and choose the products needed for your target.
+3. Select the version rule (e.g. Up to Next Major `0.3.0`) and choose the products needed for your target.
 
 ### Documentation & Tooling Plugins
 

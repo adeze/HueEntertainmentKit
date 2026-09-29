@@ -1,4 +1,6 @@
 import Foundation
+import Network
+import dnssd
 
 public struct HueBridgeDiscovery: Sendable {
     public init() {}
@@ -6,10 +8,11 @@ public struct HueBridgeDiscovery: Sendable {
     /// Discovers Hue bridges on the local network via Bonjour mDNS for the specified duration.
     public func discoverBonjour(for duration: Duration = .seconds(3)) async throws -> [HueBridgeEndpoint] {
         HueLog.discovery.debug("Starting Bonjour discovery for \(duration)")
-        let resolver = await MainActor.run { BonjourResolver() }
-        await MainActor.run { resolver.start() }
+        let resolver = BonjourBrowser()
+        resolver.start()
+        defer { resolver.stop() }
         try await Task.sleep(for: duration)
-        let endpoints = await MainActor.run { resolver.finish() }
+        let endpoints = try resolver.finish()
         HueLog.discovery.debug("Bonjour discovery finished with \(endpoints.count) bridges")
         return endpoints
     }
@@ -18,17 +21,14 @@ public struct HueBridgeDiscovery: Sendable {
     /// Discovery terminates automatically when the stream is cancelled.
     public func bonjourStream() -> AsyncStream<HueBridgeEndpoint> {
         AsyncStream { continuation in
-            let resolver = BonjourStreamingResolver { endpoint in
-                continuation.yield(endpoint)
-            }
+            let resolver = BonjourBrowser(
+                onEndpoint: { endpoint in continuation.yield(endpoint) },
+                onFailure: { continuation.finish() }
+            )
             continuation.onTermination = { @Sendable _ in
-                Task { @MainActor in
-                    resolver.stop()
-                }
+                resolver.stop()
             }
-            Task { @MainActor in
-                resolver.start()
-            }
+            resolver.start()
         }
     }
 
@@ -50,113 +50,161 @@ public struct HueBridgeDiscovery: Sendable {
     public func manual(host: String, port: Int = 443, bridgeID: String? = nil) throws -> HueBridgeEndpoint {
         try HueBridgeEndpoint(host: host, port: port, bridgeID: bridgeID)
     }
+
+    static func resolvedBonjourEndpoint(host: String, networkPort: UInt16, bridgeID: String?) -> HueBridgeEndpoint? {
+        let normalizedHost = host.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        return try? HueBridgeEndpoint(
+            host: normalizedHost, port: Int(UInt16(bigEndian: networkPort)), bridgeID: bridgeID
+        )
+    }
 }
 
 private struct BrokerBridge: Decodable { let id: String; let internalipaddress: String }
 
-private final class BonjourResolver: NSObject, NetServiceBrowserDelegate, NetServiceDelegate, @unchecked Sendable {
-    private let browser = NetServiceBrowser()
-    private let lock = NSLock()
-    private var services: [NetService] = []
-    private var resolved: [HueBridgeEndpoint] = []
+// Browser callbacks and DNS-SD references share one serial queue.
+private final class BonjourBrowser: @unchecked Sendable {
+    private let queue = DispatchQueue(label: "com.adeze.HueEntertainmentKit.bonjour")
+    private let browser = NWBrowser(for: .bonjour(type: "_hue._tcp", domain: "local."), using: .tcp)
+    private var services = Set<NWEndpoint>()
+    private var resolutions: [NWEndpoint: (reference: DNSServiceRef, token: UUID)] = [:]
+    private var endpoints = Set<HueBridgeEndpoint>()
+    private var onEndpoint: (@Sendable (HueBridgeEndpoint) -> Void)?
+    private var onFailure: (@Sendable () -> Void)?
+    private var failure: NWError?
+    private var stopped = false
 
-    override init() {
-        super.init()
-        browser.delegate = self
-    }
-
-    func start() { browser.searchForServices(ofType: "_hue._tcp.", inDomain: "local.") }
-
-    func finish() -> [HueBridgeEndpoint] {
-        browser.stop()
-        lock.lock()
-        services.forEach { $0.stop() }
-        let output = Array(Set(resolved)).sorted { $0.host < $1.host }
-        lock.unlock()
-        return output
-    }
-
-    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        lock.lock()
-        services.append(service)
-        lock.unlock()
-        service.delegate = self
-        service.resolve(withTimeout: 2)
-    }
-
-    func netServiceDidResolveAddress(_ sender: NetService) {
-        let bridgeID = sender.txtRecordData().flatMap { data in
-            NetService.dictionary(fromTXTRecord: data)["bridgeid"]
-                .flatMap { String(data: $0, encoding: .utf8) }
-        }
-        guard let host = sender.hostName?.trimmingCharacters(in: CharacterSet(charactersIn: ".")), !host.isEmpty,
-              let endpoint = try? HueBridgeEndpoint(
-                host: host,
-                port: sender.port > 0 ? sender.port : 443,
-                bridgeID: bridgeID
-              )
-        else { return }
-        lock.lock()
-        resolved.append(endpoint)
-        lock.unlock()
-    }
-}
-
-private final class BonjourStreamingResolver: NSObject, NetServiceBrowserDelegate, NetServiceDelegate, @unchecked Sendable {
-    private let browser = NetServiceBrowser()
-    private let lock = NSLock()
-    private var services: [NetService] = []
-    private var seen = Set<HueBridgeEndpoint>()
-    private let onEndpoint: @Sendable (HueBridgeEndpoint) -> Void
-
-    init(onEndpoint: @escaping @Sendable (HueBridgeEndpoint) -> Void) {
+    init(
+        onEndpoint: (@Sendable (HueBridgeEndpoint) -> Void)? = nil,
+        onFailure: (@Sendable () -> Void)? = nil
+    ) {
         self.onEndpoint = onEndpoint
-        super.init()
-        browser.delegate = self
+        self.onFailure = onFailure
+        browser.browseResultsChangedHandler = { [weak self] results, _ in
+            self?.update(results)
+        }
+        browser.stateUpdateHandler = { [weak self] state in
+            if case .failed(let error) = state {
+                self?.handleFailure(error)
+            }
+        }
     }
 
     func start() {
-        HueLog.discovery.debug("Starting Bonjour streaming discovery")
-        browser.searchForServices(ofType: "_hue._tcp.", inDomain: "local.")
+        browser.start(queue: queue)
+    }
+
+    func finish() throws -> [HueBridgeEndpoint] {
+        try queue.sync {
+            stopOnQueue()
+            if let failure { throw failure }
+            return endpoints.sorted {
+                ($0.host, $0.port, $0.bridgeID ?? "") < ($1.host, $1.port, $1.bridgeID ?? "")
+            }
+        }
     }
 
     func stop() {
-        browser.stop()
-        lock.lock()
-        services.forEach { $0.stop() }
-        services.removeAll()
-        lock.unlock()
-        HueLog.discovery.debug("Stopped Bonjour streaming discovery")
+        queue.async { self.stopOnQueue() }
     }
 
-    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        lock.lock()
-        services.append(service)
-        lock.unlock()
-        service.delegate = self
-        service.resolve(withTimeout: 2)
-    }
-
-    func netServiceDidResolveAddress(_ sender: NetService) {
-        let bridgeID = sender.txtRecordData().flatMap { data in
-            NetService.dictionary(fromTXTRecord: data)["bridgeid"]
-                .flatMap { String(data: $0, encoding: .utf8) }
+    private func stopOnQueue() {
+        guard !stopped else { return }
+        stopped = true
+        browser.cancel()
+        for resolution in resolutions.values {
+            DNSServiceRefDeallocate(resolution.reference)
         }
-        guard let host = sender.hostName?.trimmingCharacters(in: CharacterSet(charactersIn: ".")), !host.isEmpty,
-              let endpoint = try? HueBridgeEndpoint(
-                host: host,
-                port: sender.port > 0 ? sender.port : 443,
-                bridgeID: bridgeID
-              )
+        resolutions.removeAll()
+        services.removeAll()
+        onEndpoint = nil
+        onFailure = nil
+    }
+
+    private func handleFailure(_ error: NWError) {
+        guard !stopped else { return }
+        HueLog.discovery.error("Bonjour browser failed: \(error)")
+        failure = error
+        onFailure?()
+        stopOnQueue()
+    }
+
+    private func update(_ results: Set<NWBrowser.Result>) {
+        guard !stopped else { return }
+        let current = Set(results.map(\.endpoint))
+        for endpoint in services.subtracting(current) {
+            if let resolution = resolutions.removeValue(forKey: endpoint) {
+                DNSServiceRefDeallocate(resolution.reference)
+            }
+        }
+        for endpoint in current.subtracting(services) {
+            resolve(endpoint)
+        }
+        services = current
+    }
+
+    private func resolve(_ endpoint: NWEndpoint) {
+        guard case let .service(name, type, domain, interface) = endpoint else { return }
+        var reference: DNSServiceRef?
+        let status = DNSServiceResolve(
+            &reference, 0, UInt32(interface?.index ?? 0), name, type, domain,
+            { service, _, _, error, _, host, port, txtLength, txt, context in
+                guard let context else { return }
+                let owner = Unmanaged<BonjourBrowser>.fromOpaque(context).takeUnretainedValue()
+                var bridgeID: String?
+                if error == kDNSServiceErr_NoError, let txt, txtLength > 0 {
+                    var valueLength: UInt8 = 0
+                    if let value = TXTRecordGetValuePtr(txtLength, txt, "bridgeid", &valueLength) {
+                        bridgeID = String(data: Data(bytes: value, count: Int(valueLength)), encoding: .utf8)
+                    }
+                }
+                let hostname = error == kDNSServiceErr_NoError ? host.map { String(cString: $0) } : nil
+                owner.didResolve(
+                    service: service, error: error, host: hostname, port: port, bridgeID: bridgeID
+                )
+            },
+            Unmanaged.passUnretained(self).toOpaque()
+        )
+        guard status == kDNSServiceErr_NoError, let reference else {
+            HueLog.discovery.warning("Bonjour service resolution failed: \(status)")
+            return
+        }
+        guard DNSServiceSetDispatchQueue(reference, queue) == kDNSServiceErr_NoError else {
+            DNSServiceRefDeallocate(reference)
+            return
+        }
+        let token = UUID()
+        resolutions[endpoint] = (reference, token)
+        queue.asyncAfter(deadline: .now() + 2) { [weak self] in
+            self?.expire(endpoint, token: token)
+        }
+    }
+
+    private func expire(_ endpoint: NWEndpoint, token: UUID) {
+        guard let resolution = resolutions[endpoint], resolution.token == token else { return }
+        resolutions.removeValue(forKey: endpoint)
+        DNSServiceRefDeallocate(resolution.reference)
+    }
+
+    private func didResolve(
+        service: DNSServiceRef?, error: DNSServiceErrorType, host: String?,
+        port: UInt16, bridgeID: String?
+    ) {
+        guard let service, let endpoint = resolutions.first(where: { $0.value.reference == service })?.key,
+              let resolution = resolutions.removeValue(forKey: endpoint)
         else { return }
-
-        lock.lock()
-        let isNew = seen.insert(endpoint).inserted
-        lock.unlock()
-
-        if isNew {
-            HueLog.discovery.debug("Bonjour resolved new bridge: \(endpoint.host)")
-            onEndpoint(endpoint)
+        let bridge: HueBridgeEndpoint?
+        if error == kDNSServiceErr_NoError, let host {
+            bridge = HueBridgeDiscovery.resolvedBonjourEndpoint(
+                host: host, networkPort: port, bridgeID: bridgeID
+            )
+        } else {
+            bridge = nil
+        }
+        DNSServiceRefDeallocate(resolution.reference)
+        guard let bridge else { return }
+        if endpoints.insert(bridge).inserted {
+            HueLog.discovery.debug("Bonjour resolved new bridge: \(bridge.host)")
+            onEndpoint?(bridge)
         }
     }
 }

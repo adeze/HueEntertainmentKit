@@ -36,7 +36,7 @@ HueEntertainmentKit is an independent Swift implementation of the Philips Hue En
 ### Requirements
 
 - **macOS**: 15.0 or later
-- **Xcode**: 16.0 or later (Swift 6.0+)
+- **Xcode**: 27.0 or later (Swift 6.4+)
 - **Command Line Tools**: SwiftPM CLI
 
 ### Building and Testing

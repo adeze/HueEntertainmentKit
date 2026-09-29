@@ -18,7 +18,7 @@ The repository contains three primary libraries, an AUv3-compatible audio realti
 ## Non-Negotiable Rules & Invariants
 
 1. **Swift 6 Strict Concurrency**:
-   - The package is configured with `swiftLanguageModes: [.v6]`.
+   - Use Swift 6.4 or later; the package is configured with `swiftLanguageModes: [.v6]`.
    - All shared types must be `Sendable` or actor-isolated (`HueEntertainmentSession`).
    - Global state is prohibited unless isolated or proven constant (`public static let`).
    - Zero data races and zero compiler warnings under Swift 6.

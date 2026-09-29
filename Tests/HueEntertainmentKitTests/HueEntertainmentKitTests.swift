@@ -1,5 +1,5 @@
 import Foundation
-import HueEntertainmentKit
+@testable import HueEntertainmentKit
 import HueEntertainmentTesting
 import NIOCore
 import NIOEmbedded
@@ -7,6 +7,22 @@ import Security
 import Testing
 
 @Suite struct HueEntertainmentKitTests {
+    @Test func bonjourResolutionPreservesHostPortAndBridgeID() throws {
+        let resolved = try #require(HueBridgeDiscovery.resolvedBonjourEndpoint(
+            host: "bridge.local.", networkPort: UInt16(8443).bigEndian,
+            bridgeID: "0011223344556677"
+        ))
+        #expect(resolved.host == "bridge.local")
+        #expect(resolved.port == 8443)
+        #expect(resolved.bridgeID == "0011223344556677")
+        #expect(HueBridgeDiscovery.resolvedBonjourEndpoint(
+            host: ".", networkPort: UInt16(443).bigEndian, bridgeID: nil
+        ) == nil)
+        #expect(HueBridgeDiscovery.resolvedBonjourEndpoint(
+            host: "bridge.local.", networkPort: UInt16(443).bigEndian, bridgeID: "invalid"
+        ) == nil)
+    }
+
     @Test func packetGoldenBytesAndSequence() throws {
         let id = UUID(uuidString: "00112233-4455-6677-8899-aabbccddeeff")!
         let frame = try HueFrame(colors: [

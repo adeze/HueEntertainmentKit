@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.4
 
 import PackageDescription
 
@@ -19,12 +19,12 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio-transport-services.git", from: "1.28.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.102.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0"),
-        .package(url: "https://github.com/apple/swift-async-algorithms.git", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.0"),
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin.git", from: "1.4.3"),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.103.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.15.1"),
+        .package(url: "https://github.com/apple/swift-async-algorithms.git", from: "1.1.6"),
+        .package(url: "https://github.com/apple/swift-collections.git", from: "1.7.1"),
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin.git", from: "1.5.0"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.65.1"),
     ],
     targets: [
         .target(
